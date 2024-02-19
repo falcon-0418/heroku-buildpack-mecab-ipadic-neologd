@@ -47,3 +47,9 @@ cd mecab-ipadic-neologd
 ./bin/install-mecab-ipadic-neologd -n -y -p /app/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
 
 echo "MeCab and mecab-ipadic-NEologd installation completed." | indent
+
+# MECAB_PATHの環境変数を設定
+echo "Setting MECAB_PATH environment variable"
+MECAB_PATH="/app/.heroku/mecab/lib/libmecab.so"
+export MECAB_PATH
+echo "MECAB_PATH set to $MECAB_PATH" | indent

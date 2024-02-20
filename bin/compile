@@ -5,19 +5,22 @@ indent() {
   sed -u 's/^/       /'
 }
 
-# MeCabのインストール
 echo "-----> Installing MeCab"
 BUILD_DIR=$1
 CACHE_DIR=$2
 MECAB_VERSION="0.996"
+MECAB_IPADIC_NEOLOGD_VERSION="installed_version.txt"
 MECAB_URL="https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE"
+CLONE_URL="https://github.com/neologd/mecab-ipadic-neologd"
 
-# MeCabのソースコードをダウンロードして展開
+# MeCabのキャッシュ利用のチェック
 cd $CACHE_DIR
 if [ ! -d "mecab-$MECAB_VERSION" ]; then
   echo "Downloading MeCab $MECAB_VERSION" | indent
   curl -L -o mecab-$MECAB_VERSION.tar.gz $MECAB_URL
   tar zxf mecab-$MECAB_VERSION.tar.gz
+else
+  echo "Using cached MeCab $MECAB_VERSION" | indent
 fi
 
 # MeCabのコンパイルとインストール
@@ -29,22 +32,24 @@ make && make install
 export PATH="/app/.heroku/mecab/bin:$PATH"
 export LD_LIBRARY_PATH="/app/.heroku/mecab/lib:$LD_LIBRARY_PATH"
 
-# mecab-ipadic-NEologdのインストール
+# mecab-ipadic-NEologdのインストール（キャッシュ利用）
 echo "-----> Installing mecab-ipadic-NEologd"
 VENDOR_DIR="$BUILD_DIR/.heroku/mecab"
-CLONE_URL="https://github.com/neologd/mecab-ipadic-neologd"
-
-echo "CLONE_URL = $CLONE_URL" | indent
-
 mkdir -p $VENDOR_DIR
 cd $VENDOR_DIR
 
-if [ ! -d "mecab-ipadic-neologd" ]; then
-  git clone --depth 1 $CLONE_URL
-fi
+if [ -f "$MECAB_IPADIC_NEOLOGD_VERSION" ]; then
+  echo "Using cached mecab-ipadic-NEologd" | indent
+else
+  echo "CLONE_URL = $CLONE_URL" | indent
+  if [ ! -d "mecab-ipadic-neologd" ]; then
+    git clone --depth 1 $CLONE_URL
+  fi
 
-cd mecab-ipadic-neologd
-./bin/install-mecab-ipadic-neologd -n -y -p /app/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
+  cd mecab-ipadic-neologd
+  ./bin/install-mecab-ipadic-neologd -n -y -p /app/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
+  echo $(date) > $CACHE_DIR/$MECAB_IPADIC_NEOLOGD_VERSION
+fi
 
 echo "MeCab and mecab-ipadic-NEologd installation completed." | indent
 

@@ -1,10 +1,16 @@
 #!/bin/sh
 
-# this pack requires mecab and mecab-ipadic
+# Gemfileが存在するかチェック
+if [ ! -f $1/Gemfile ]; then
+  echo "No Gemfile found"
+  exit 1
+fi
 
-if [ -f $1/.linuxbrew/bin/mecab ]; then
-  echo "mecab-ipadic-NEologd"
+# Gemfileに'natto'が含まれているか確認
+if grep -q "gem 'natto'" "$1/Gemfile"; then
+  echo "natto gem found"
   exit 0
 else
+  echo "natto gem not found"
   exit 1
 fi

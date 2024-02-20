@@ -49,6 +49,10 @@ else
   cd mecab-ipadic-neologd
   ./bin/install-mecab-ipadic-neologd -n -y -p /app/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
   echo $(date) > $CACHE_DIR/$MECAB_IPADIC_NEOLOGD_VERSION
+
+  # 不要なビルドディレクトリの削除
+  echo "Cleaning up build directories" | indent
+  rm -rf build
 fi
 
 echo "MeCab and mecab-ipadic-NEologd installation completed." | indent

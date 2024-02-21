@@ -32,6 +32,10 @@ make && make install
 export PATH="/app/.heroku/mecab/bin:$PATH"
 export LD_LIBRARY_PATH="/app/.heroku/mecab/lib:$LD_LIBRARY_PATH"
 
+# libmecab.soの存在確認
+echo "Checking for libmecab.so in /app/.heroku/mecab/lib"
+ls -l /app/.heroku/mecab/lib/libmecab.so | indent
+
 # mecab-ipadic-NEologdのインストール（キャッシュ利用）
 echo "-----> Installing mecab-ipadic-NEologd"
 VENDOR_DIR="$BUILD_DIR/.heroku/mecab"
@@ -50,9 +54,15 @@ else
   ./bin/install-mecab-ipadic-neologd -n -y -p /app/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
   echo $(date) > $CACHE_DIR/$MECAB_IPADIC_NEOLOGD_VERSION
 
-  # 不要なビルドディレクトリの削除
+  # 不要なビルドディレクトリの削除と確認
   echo "Cleaning up build directories" | indent
   rm -rf build
+  # 削除後の確認
+  if [ ! -d build ]; then
+    echo "Build directory successfully removed." | indent
+  else
+    echo "Failed to remove build directory." | indent
+  fi
 fi
 
 echo "MeCab and mecab-ipadic-NEologd installation completed." | indent

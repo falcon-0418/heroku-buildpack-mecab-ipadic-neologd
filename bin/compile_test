@@ -25,16 +25,16 @@ fi
 
 # MeCabのコンパイルとインストール
 cd mecab-$MECAB_VERSION
-./configure --prefix=/app/.heroku/mecab --enable-utf8-only
+./configure --prefix=$BUILD_DIR/.heroku/mecab --enable-utf8-only
 make && make install
 
 # PATHとLD_LIBRARY_PATHの設定
-export PATH="/app/.heroku/mecab/bin:$PATH"
-export LD_LIBRARY_PATH="/app/.heroku/mecab/lib:$LD_LIBRARY_PATH"
+export PATH="$BUILD_DIR/.heroku/mecab/bin:$PATH"
+export LD_LIBRARY_PATH="$BUILD_DIR/.heroku/mecab/lib:$LD_LIBRARY_PATH"
 
 # libmecab.soの存在確認
-echo "Checking for libmecab.so in /app/.heroku/mecab/lib"
-ls -l /app/.heroku/mecab/lib/libmecab.so | indent
+echo "Checking for libmecab.so in $BUILD_DIR/.heroku/mecab/lib"
+ls -l $BUILD_DIR/.heroku/mecab/lib/libmecab.so | indent
 
 # mecab-ipadic-NEologdのインストール（キャッシュ利用）
 echo "-----> Installing mecab-ipadic-NEologd"
@@ -42,7 +42,7 @@ VENDOR_DIR="$BUILD_DIR/.heroku/mecab"
 mkdir -p $VENDOR_DIR
 cd $VENDOR_DIR
 
-if [ -f "$MECAB_IPADIC_NEOLOGD_VERSION" ]; then
+if [ -f "$CACHE_DIR/$MECAB_IPADIC_NEOLOGD_VERSION" ]; then
   echo "Using cached mecab-ipadic-NEologd" | indent
 else
   echo "CLONE_URL = $CLONE_URL" | indent
@@ -51,24 +51,14 @@ else
   fi
 
   cd mecab-ipadic-neologd
-  ./bin/install-mecab-ipadic-neologd -n -y -p /app/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
+  ./bin/install-mecab-ipadic-neologd -n -y -p $BUILD_DIR/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
   echo $(date) > $CACHE_DIR/$MECAB_IPADIC_NEOLOGD_VERSION
-
-  # # 不要なビルドディレクトリの削除と確認
-  # echo "Cleaning up build directories" | indent
-  # rm -rf build
-  # # 削除後の確認
-  # if [ ! -d build ]; then
-  #   echo "Build directory successfully removed." | indent
-  # else
-  #   echo "Failed to remove build directory." | indent
-  # fi
 fi
 
 echo "MeCab and mecab-ipadic-NEologd installation completed." | indent
 
 # MECAB_PATHの環境変数を設定
 echo "Setting MECAB_PATH environment variable"
-MECAB_PATH="/app/.heroku/mecab/lib/libmecab.so"
+MECAB_PATH="$BUILD_DIR/.heroku/mecab/lib/libmecab.so"
 export MECAB_PATH
 echo "MECAB_PATH set to $MECAB_PATH" | indent

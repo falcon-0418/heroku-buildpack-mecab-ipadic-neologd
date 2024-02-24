@@ -54,21 +54,16 @@ else
   ./bin/install-mecab-ipadic-neologd -n -y -p /app/.heroku/mecab/lib/mecab/dic/mecab-ipadic-neologd
   echo $(date) > $CACHE_DIR/$MECAB_IPADIC_NEOLOGD_VERSION
 
-  # # 不要なビルドディレクトリの削除と確認
-  # echo "Cleaning up build directories" | indent
-  # rm -rf build
-  # # 削除後の確認
-  # if [ ! -d build ]; then
-  #   echo "Build directory successfully removed." | indent
-  # else
-  #   echo "Failed to remove build directory." | indent
-  # fi
+  # 不要なビルドディレクトリの削除と確認
+  echo "Cleaning up build directories" | indent
+  rm -rf build
+  # 削除後の確認
+  if [ ! -d build ]; then
+    echo "Build directory successfully removed." | indent
+  else
+    echo "Failed to remove build directory." | indent
+  fi
 fi
-
-# ChangeLogの削除
-echo "Removing MeCab ChangeLog" | indent
-rm -f $BUILD_DIR/mecab-$MECAB_VERSION/ChangeLog
-rm -f $VENDOR_DIR/mecab-ipadic-neologd/ChangeLog
 
 echo "MeCab and mecab-ipadic-NEologd installation completed." | indent
 

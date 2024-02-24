@@ -65,6 +65,11 @@ else
   # fi
 fi
 
+# ChangeLogの削除
+echo "Removing MeCab ChangeLog" | indent
+rm -f $BUILD_DIR/mecab-$MECAB_VERSION/ChangeLog
+rm -f $VENDOR_DIR/mecab-ipadic-neologd/ChangeLog
+
 echo "MeCab and mecab-ipadic-NEologd installation completed." | indent
 
 # MECAB_PATHの環境変数を設定
